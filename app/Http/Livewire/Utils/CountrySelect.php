@@ -82,7 +82,7 @@ class CountrySelect extends LivewireSelect
             ->first(function ($tag) use ($value) {
                 return (strcmp($value,$tag['value'])==0);
             });
-        $this->emit('updateCountry', [$value => $selectedOption]);
+        // $this->emit('updateCountry', [$value => $selectedOption]);
         return $selectedOption;
     }
     // public function render()

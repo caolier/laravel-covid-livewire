@@ -35,12 +35,21 @@
                     </div> 
                     <div class="">
                         <ul tabindex="0" class="grid gap-2 gap-y-4 w-max py-1 mr-2 shadow menu dropdown-content bg-base-100 rounded-box flex-row">
-                            <li>
+                          @if($selected_tab=='list_global_per_day')
+                          <li>
                                 <a class="">{{__('app.list_global_per_day')}}</a>
                             </li> 
                             <li>
-                                <a class="">{{__('app.list_by_country')}}</a>
+                                <a wire:click.prevent="TabSelectData('list_by_country')" class="">{{__('app.list_by_country')}}</a>
                             </li>
+                            @else 
+                            <li>
+                              <a wire:click.prevent="TabSelectData('list_global_per_day')" class="">{{__('app.list_global_per_day')}}</a>
+                          </li> 
+                          <li>
+                              <a class="">{{__('app.list_by_country')}}</a>
+                          </li>
+                          @endif
                         </ul>
                     </div>
                 </div>
@@ -52,27 +61,42 @@
                             {{__('app.'.$selected_tab)}}
                         </a> 
                     </div>
+                    @if($selected_tab=='list_global_per_day')
                     <div class="items-stretch hidden md:flex">
-                        <a class="btn btn-ghost btn-sm rounded-btn">
+                        <a class="btn btn-sm rounded-btn">
                             {{__('app.list_global_per_day')}}
                         </a> 
-                        <a class="btn btn-ghost btn-sm rounded-btn">
+                        <a wire:click.prevent="TabSelectData('list_by_country')" class="btn btn-ghost btn-sm rounded-btn">
                             {{__('app.list_by_country')}}
                         </a> 
                     </div>
+                    @else
+                    <div class="items-stretch hidden md:flex">
+                      <a wire:click.prevent="TabSelectData('list_global_per_day')" class="btn btn-ghost btn-sm rounded-btn">
+                          {{__('app.list_global_per_day')}}
+                      </a> 
+                      <a class="btn btn-sm rounded-btn">
+                          {{__('app.list_by_country')}}
+                      </a> 
+                  </div>
+                  @endif
+
+
                 </div>
 
-                {{-- Selección actual --}}
-                <div class="flex-1 lg:flex-none hidden">
-                    <div class="badge badge-neutral mr-5 h-10">
-                        # {{$country_id}} #
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-4 h-4 mr-2 stroke-current">   
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>                       
-                        </svg>
-                    </div> 
-                </div>
-                {{-- Busqueda --}}
                 <div class="flex-none justify-end">
+                  {{-- Selección actual --}}
+                  @if(!empty($country_id))
+                  <div class="flex-1 lg:flex-none">
+                      <div class="badge badge-neutral mr-5 h-10">
+                          {{$country_id}} {{$selected_tab}}
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-4 h-4 mr-2 hidden stroke-current">   
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>                       
+                          </svg>
+                      </div> 
+                  </div>
+                  @endif
+                  {{-- Busqueda --}}
                     <div class="form-control w-28 sm:w-40 md:w-60">
                         {{-- <div wire:loading.delay.long > --}}
                         <livewire:utils.country-select name="country_id" :value="$country_id" placeholder="{{__('Search')}}"  :searchable="true" class="input input-ghost bg-base-200" />
@@ -89,212 +113,93 @@
               
               
 
-            <div class="overflow-x-auto">
+              <div>@php $paginator= $CovidDataTable @endphp
+                   @if ($paginator->hasPages())
+                       <nav role="navigation" aria-label="Pagination Navigation" class="flex justify-between">
+                           <span>
+                               {{-- Previous Page Link --}}
+                               @if ($paginator->onFirstPage())
+                                   <span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default leading-5 rounded-md">
+                                       {!! __('pagination.previous') !!}
+                                   </span>
+                               @else
+                                   <button wire:click="$set('pageID',{{$pageID-1}})"  rel="prev" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">
+                                       {!! __('pagination.previous') !!}
+                                   </button>
+                               @endif
+                           </span>
+                
+                           <span>
+                               {{-- Next Page Link --}}
+                               @if ($paginator->hasMorePages())
+                                   <button wire:click="$set('pageID',{{$pageID+1}})"  rel="next" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">
+                                       {!! __('pagination.next') !!}
+                                   </button>
+                               @else
+                                   <span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default leading-5 rounded-md">
+                                       {!! __('pagination.next') !!}
+                                   </span>
+                               @endif
+                           </span>
+                       </nav>
+                   @endif
+               </div>                
+
+               <div class="overflow-x-auto">
                 <table class="table w-full table-compact">
                   <thead>
                     <tr>
-                      <th></th> 
-                      <th>Name</th> 
-                      <th>Job</th> 
-                      <th>company</th> 
-                      <th>location</th> 
-                      <th>Last Login</th> 
-                      <th>Favorite Color</th>
+                      <th>&nbsp;</th> 
+                      <th>{{__('country')}}</th> 
+                      <th>{{__('cases')}}</th> 
+                      <th>{{__('todayCases')}}</th> 
+                      <th>{{__('deaths')}}</th> 
+                      <th>{{__('todayDeaths')}}</th> 
+                      <th>{{__('recovered')}}</th> 
+                      <th>{{__('todayRecovered')}}</th> 
+                      <th>{{__('active')}}</th> 
+                      <th>{{__('critical')}}</th> 
+                      <th>{{__('tests')}}</th> 
+                      <th>{{__('updated')}}</th> 
                     </tr>
                   </thead> 
                   <tbody>
+                    @forelse ($CovidDataTable as $CountryData)
                     <tr>
-                      <th>1</th> 
-                      <td>Cy Ganderton</td> 
-                      <td>Quality Control Specialist</td> 
-                      <td>Littel, Schaden and Vandervort</td> 
-                      <td>Canada</td> 
-                      <td>12/16/2020</td> 
-                      <td>Blue</td>
+                      <th>{{$loop->iteration}}</th> 
+                      <td>{{$CountryData['country']}}</td> 
+                      <td>{{$CountryData['cases']}}</td> 
+                      <td>{{$CountryData['todayCases']}}</td> 
+                      <td>{{$CountryData['deaths']}}</td> 
+                      <td>{{$CountryData['todayDeaths']}}</td> 
+                      <td>{{$CountryData['recovered']}}</td> 
+                      <td>{{$CountryData['todayRecovered']}}</td> 
+                      <td>{{$CountryData['active']}}</td> 
+                      <td>{{$CountryData['critical']}}</td> 
+                      <td>{{$CountryData['tests']}}</td> 
+                      <td>{{$this->dateForHumans($CountryData['updated'])}}</td> 
                     </tr>
+                    {{-- 0 => array:23 [
+                      "updated" => 1633161656879
+                      "country" => "Afghanistan"
+                      "countryInfo" => array:6 
+                      "cases" => 155239
+                      "todayCases" => 0
+                      "deaths" => 7211
+                      "todayDeaths" => 0
+                      "recovered" => 125021
+                      "todayRecovered" => 0
+                      "active" => 23007
+                      "critical" => 1124
+                      "tests" => 761015 --}}
+                    @empty
                     <tr>
-                      <th>2</th> 
-                      <td>Hart Hagerty</td> 
-                      <td>Desktop Support Technician</td> 
-                      <td>Zemlak, Daniel and Leannon</td> 
-                      <td>United States</td> 
-                      <td>12/5/2020</td> 
-                      <td>Purple</td>
+                      <th>&nbsp;</th> 
+                      <td>{{__('No Results Found.')}}</td> 
+                      <td>&nbsp;</td> 
                     </tr>
-                    <tr>
-                      <th>3</th> 
-                      <td>Brice Swyre</td> 
-                      <td>Tax Accountant</td> 
-                      <td>Carroll Group</td> 
-                      <td>China</td> 
-                      <td>8/15/2020</td> 
-                      <td>Red</td>
-                    </tr>
-                    <tr>
-                      <th>4</th> 
-                      <td>Marjy Ferencz</td> 
-                      <td>Office Assistant I</td> 
-                      <td>Rowe-Schoen</td> 
-                      <td>Russia</td> 
-                      <td>3/25/2021</td> 
-                      <td>Crimson</td>
-                    </tr>
-                    <tr>
-                      <th>5</th> 
-                      <td>Yancy Tear</td> 
-                      <td>Community Outreach Specialist</td> 
-                      <td>Wyman-Ledner</td> 
-                      <td>Brazil</td> 
-                      <td>5/22/2020</td> 
-                      <td>Indigo</td>
-                    </tr>
-                    <tr>
-                      <th>6</th> 
-                      <td>Irma Vasilik</td> 
-                      <td>Editor</td> 
-                      <td>Wiza, Bins and Emard</td> 
-                      <td>Venezuela</td> 
-                      <td>12/8/2020</td> 
-                      <td>Purple</td>
-                    </tr>
-                    <tr>
-                      <th>7</th> 
-                      <td>Meghann Durtnal</td> 
-                      <td>Staff Accountant IV</td> 
-                      <td>Schuster-Schimmel</td> 
-                      <td>Philippines</td> 
-                      <td>2/17/2021</td> 
-                      <td>Yellow</td>
-                    </tr>
-                    <tr>
-                      <th>8</th> 
-                      <td>Sammy Seston</td> 
-                      <td>Accountant I</td> 
-                      <td>O'Hara, Welch and Keebler</td> 
-                      <td>Indonesia</td> 
-                      <td>5/23/2020</td> 
-                      <td>Crimson</td>
-                    </tr>
-                    <tr>
-                      <th>9</th> 
-                      <td>Lesya Tinham</td> 
-                      <td>Safety Technician IV</td> 
-                      <td>Turner-Kuhlman</td> 
-                      <td>Philippines</td> 
-                      <td>2/21/2021</td> 
-                      <td>Maroon</td>
-                    </tr>
-                    <tr>
-                      <th>10</th> 
-                      <td>Zaneta Tewkesbury</td> 
-                      <td>VP Marketing</td> 
-                      <td>Sauer LLC</td> 
-                      <td>Chad</td> 
-                      <td>6/23/2020</td> 
-                      <td>Green</td>
-                    </tr>
-                    <tr>
-                      <th>11</th> 
-                      <td>Andy Tipple</td> 
-                      <td>Librarian</td> 
-                      <td>Hilpert Group</td> 
-                      <td>Poland</td> 
-                      <td>7/9/2020</td> 
-                      <td>Indigo</td>
-                    </tr>
-                    <tr>
-                      <th>12</th> 
-                      <td>Sophi Biles</td> 
-                      <td>Recruiting Manager</td> 
-                      <td>Gutmann Inc</td> 
-                      <td>Indonesia</td> 
-                      <td>2/12/2021</td> 
-                      <td>Maroon</td>
-                    </tr>
-                    <tr>
-                      <th>13</th> 
-                      <td>Florida Garces</td> 
-                      <td>Web Developer IV</td> 
-                      <td>Gaylord, Pacocha and Baumbach</td> 
-                      <td>Poland</td> 
-                      <td>5/31/2020</td> 
-                      <td>Purple</td>
-                    </tr>
-                    <tr>
-                      <th>14</th> 
-                      <td>Maribeth Popping</td> 
-                      <td>Analyst Programmer</td> 
-                      <td>Deckow-Pouros</td> 
-                      <td>Portugal</td> 
-                      <td>4/27/2021</td> 
-                      <td>Aquamarine</td>
-                    </tr>
-                    <tr>
-                      <th>15</th> 
-                      <td>Moritz Dryburgh</td> 
-                      <td>Dental Hygienist</td> 
-                      <td>Schiller, Cole and Hackett</td> 
-                      <td>Sri Lanka</td> 
-                      <td>8/8/2020</td> 
-                      <td>Crimson</td>
-                    </tr>
-                    <tr>
-                      <th>16</th> 
-                      <td>Reid Semiras</td> 
-                      <td>Teacher</td> 
-                      <td>Sporer, Sipes and Rogahn</td> 
-                      <td>Poland</td> 
-                      <td>7/30/2020</td> 
-                      <td>Green</td>
-                    </tr>
-                    <tr>
-                      <th>17</th> 
-                      <td>Alec Lethby</td> 
-                      <td>Teacher</td> 
-                      <td>Reichel, Glover and Hamill</td> 
-                      <td>China</td> 
-                      <td>2/28/2021</td> 
-                      <td>Khaki</td>
-                    </tr>
-                    <tr>
-                      <th>18</th> 
-                      <td>Aland Wilber</td> 
-                      <td>Quality Control Specialist</td> 
-                      <td>Kshlerin, Rogahn and Swaniawski</td> 
-                      <td>Czech Republic</td> 
-                      <td>9/29/2020</td> 
-                      <td>Purple</td>
-                    </tr>
-                    <tr>
-                      <th>19</th> 
-                      <td>Teddie Duerden</td> 
-                      <td>Staff Accountant III</td> 
-                      <td>Pouros, Ullrich and Windler</td> 
-                      <td>France</td> 
-                      <td>10/27/2020</td> 
-                      <td>Aquamarine</td>
-                    </tr>
-                    <tr>
-                      <th>20</th> 
-                      <td>Lorelei Blackstone</td> 
-                      <td>Data Coordiator</td> 
-                      <td>Witting, Kutch and Greenfelder</td> 
-                      <td>Kazakhstan</td> 
-                      <td>6/3/2020</td> 
-                      <td>Red</td>
-                    </tr>
+                    @endforelse
                   </tbody> 
-                  <tfoot>
-                    <tr>
-                      <th></th> 
-                      <th>Name</th> 
-                      <th>Job</th> 
-                      <th>company</th> 
-                      <th>location</th> 
-                      <th>Last Login</th> 
-                      <th>Favorite Color</th>
-                    </tr>
-                  </tfoot>
                 </table>
               </div>
 

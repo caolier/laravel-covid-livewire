@@ -3,6 +3,8 @@
 namespace App\Http\Livewire;
 
 use Livewire\Component;
+use Asantibanez\LivewireCharts\Models\ColumnChartModel;
+
 
 class CovidGlobalData extends Component
 {
@@ -31,6 +33,54 @@ class CovidGlobalData extends Component
 
     public function render()
     {
-        return view('livewire.covid-global-data');
+        
+        $newPerDayModel = $this->newPerDayModel();
+        $recoveredPerDayModel = $this->recoveredPerDayModel();
+        $deathsPerDayModel = $this->deathsPerDayModel();
+
+
+        return view('livewire.covid-global-data')->with([
+            'newPerDayModel' => $newPerDayModel,
+            'recoveredPerDayModel' => $recoveredPerDayModel,
+            'deathsPerDayModel' => $deathsPerDayModel
+        ]);
     }
+
+    public function newPerDayModel(){
+        $columnChartModel = (new ColumnChartModel())
+            ->setTitle('Expenses by Type')
+            ->addColumn('Food', 100, '#f6ad55')
+            ->addColumn('Shopping', 200, '#fc8181')
+            ->addColumn('Travel', 300, '#90cdf4')
+        ;
+
+        return $columnChartModel;
+        
+    }
+
+    public function recoveredPerDayModel(){
+        $columnChartModel = (new ColumnChartModel())
+            ->setTitle('Expenses by Type')
+            ->addColumn('Food', 100, '#f6ad55')
+            ->addColumn('Shopping', 200, '#fc8181')
+            ->addColumn('Travel', 300, '#90cdf4')
+        ;
+
+        return $columnChartModel;
+        
+    }
+
+    public function deathsPerDayModel(){
+        $columnChartModel = (new ColumnChartModel())
+            ->setTitle('Expenses by Type')
+            ->addColumn('Food', 100, '#f6ad55')
+            ->addColumn('Shopping', 200, '#fc8181')
+            ->addColumn('Travel', 300, '#90cdf4')
+        ;
+
+        return $columnChartModel;
+        
+    }
+
+
 }

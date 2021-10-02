@@ -2,16 +2,19 @@
 
     {{-- <div class="flex flex-row w-full flex-wrap-reverse"> --}}
     <div class="grid gap-4 md:grid-cols-3">
+        {{-- chart:new --}}
         <div class="grid flex-grow h-60 md:h-96 scard bg-base-300 rounded-box place-items-center">
             <div style="max-height: 28rem;" class="h-60 md:h-96">
             <livewire:livewire-column-chart :column-chart-model="$newPerDayModel"/>
             </div>
         </div> 
+        {{-- chart:recovered --}}
         <div class="grid flex-grow h-60 md:h-96 scard bg-base-300 rounded-box place-items-center">
             <div style="max-height: 28rem;" class="h-60 md:h-96">
             <livewire:livewire-column-chart :column-chart-model="$recoveredPerDayModel"/>
             </div>
         </div>
+        {{-- chart:deaths --}}
         <div class="grid flex-grow h-60 md:h-96 scard bg-base-300 rounded-box place-items-center">
             <div style="max-height: 28rem;" class="h-60 md:h-96">
             <livewire:livewire-column-chart :column-chart-model="$deathsPerDayModel"/>
@@ -21,62 +24,68 @@
     <div class="flex flex-col w-full">
         <div class="divider"></div> 
         <div class="">
-
+            {{-- begin:navbar --}}
             <div class="navbar mb-4 shadow-lg bg-base-300 text-base-content rounded-box">
-                  <div class="dropdown dropdown-right md:hidden">
+                {{-- Menú Dropdown --}}
+                <div class="dropdown dropdown-right md:hidden">
                     <div tabindex="0" class="btn btn-square btn-ghost">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current">           
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>               
-                          </svg>                            
+                        </svg>                            
                     </div> 
-                    <ul tabindex="0" class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52 flex-row">
-                      <li>
-                        <a>Item 2</a>
-                      </li> 
-                      <li>
-                        <a>Item 3</a>
-                      </li>
-                    </ul>
-                  </div>                  
+                    <div class="">
+                        <ul tabindex="0" class="grid gap-2 gap-y-4 w-max py-1 mr-2 shadow menu dropdown-content bg-base-100 rounded-box flex-row">
+                            <li>
+                                <a class="">{{__('app.list_global_per_day')}}</a>
+                            </li> 
+                            <li>
+                                <a class="">{{__('app.list_by_country')}}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
 
-               <div class="flex-none hidden ">
-                  <button class="btn btn-square btn-ghost">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current">           
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>               
-                    </svg>
-                  </button>
-                </div> 
-
+                {{-- Menú --}}
                 <div class="flex-1 px-2 mx-2">
+                    <div class="items-stretch flex md:hidden">
+                        <a class="btn btn-ghost btn-sm rounded-btn">
+                            {{__('app.'.$selected_tab)}}
+                        </a> 
+                    </div>
                     <div class="items-stretch hidden md:flex">
                         <a class="btn btn-ghost btn-sm rounded-btn">
-                        Home
+                            {{__('app.list_global_per_day')}}
                         </a> 
                         <a class="btn btn-ghost btn-sm rounded-btn">
-                        Portfolio
+                            {{__('app.list_by_country')}}
                         </a> 
                     </div>
                 </div>
 
-                <div class="flex-1 lg:flex-none">
+                {{-- Selección actual --}}
+                <div class="flex-1 lg:flex-none hidden">
                     <div class="badge badge-neutral mr-5 h-10">
-                        info
+                        # {{$country_id}} #
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-4 h-4 mr-2 stroke-current">   
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>                       
                         </svg>
                     </div> 
-                </div> 
+                </div>
+                {{-- Busqueda --}}
                 <div class="flex-none justify-end">
-                    <div class="form-control w-3/5">
-                        <input type="text" placeholder="Search" class="input input-ghost bg-base-200">
-                      </div>
-                      <button class="btn btn-square btn-ghost">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current">             
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>             
-                    </svg>
-                  </button>
+                    <div class="form-control w-28 sm:w-40 md:w-60">
+                        {{-- <div wire:loading.delay.long > --}}
+                        <livewire:utils.country-select name="country_id" :value="$country_id" placeholder="{{__('Search')}}"  :searchable="true" class="input input-ghost bg-base-200" />
+                        {{-- </div> --}}
+                    </div>
+                    <button class="btn btn-square btn-ghost">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current">             
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>             
+                        </svg>
+                    </button>
                 </div> 
-              </div>
+            </div>
+            {{-- end:navbar --}}
               
               
 

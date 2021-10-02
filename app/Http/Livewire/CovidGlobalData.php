@@ -7,11 +7,14 @@ use Livewire\Component;
 use Illuminate\Http\Client\Pool;
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Util\Json;
+use App\Models\CovidData;
 
 use Asantibanez\LivewireCharts\Models\ColumnChartModel;
 use Illuminate\Database\Eloquent\Collection;
 
 use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\CursorPaginator;
 use Livewire\WithPagination;
 
 use Carbon\CarbonInterface;
@@ -19,14 +22,22 @@ use Carbon\Carbon;
 
 class CovidGlobalData extends Component
 {
+    use WithPagination;
+
     protected $listeners = [
         // 'updateCountry' => 'updateCountry',
         'country_idUpdated' => 'updateCountry',
-        ];
+    ];
+
+    protected $queryString = [
+        // 'foo',
+        // 'search' => ['except' => ''],
+        'page' => ['except' => 1],
+    ];
+    
     public $selected_tab;
     public $country_id;
     public $collectionCovidGraphicData,$collectionCovidByCountryData;
-    public $pageID;
 
     # list_global_per_day 
     public function TabSelectData($selected_tab = null){
@@ -61,12 +72,18 @@ class CovidGlobalData extends Component
         $this->selected_day= now();
         $this->country_id='';
 
-        $this->pageID =0;
+        $this->page =0;
         $this->loadData();
+
+
+
+        
     }
 
-    public function updatedPageID(){
-        $this->hydrate();
+    public function updatedPage(){
+        // $this->paginators['page']=$this->page;
+        // $this->hydrate();
+        // dd($this);
     }
 
     public function boot(){
@@ -80,13 +97,15 @@ class CovidGlobalData extends Component
         $recoveredPerDayModel = $this->recoveredPerDayModel();
         $deathsPerDayModel = $this->deathsPerDayModel();
 
-        $CovidDataTable = $this->collectionCovidByCountryData;
-
+        $CovidDataTable = new Paginator($this->collectionCovidByCountryData,15,$this->page);
+        $CovidDataData = array_slice($this->collectionCovidByCountryData,15*$this->page,15,true);
+// dd($this->collectionCovidByCountryData);
         return view('livewire.covid-global-data')->with([
             'newPerDayModel' => $newPerDayModel,
             'recoveredPerDayModel' => $recoveredPerDayModel,
             'deathsPerDayModel' => $deathsPerDayModel,
-            'CovidDataTable' => new Paginator($CovidDataTable,15,$this->pageID)
+            'CovidDataTable' => $CovidDataTable,
+            'CovidDataData' => $CovidDataData
             
         ]);
     }

@@ -25,13 +25,10 @@ class CovidGlobalData extends Component
     use WithPagination;
 
     protected $listeners = [
-        // 'updateCountry' => 'updateCountry',
         'country_idUpdated' => 'updateCountry',
     ];
 
     protected $queryString = [
-        // 'foo',
-        // 'search' => ['except' => ''],
         'page' => ['except' => 1],
     ];
     
@@ -41,6 +38,7 @@ class CovidGlobalData extends Component
 
     # list_global_per_day 
     public function TabSelectData($selected_tab = null){
+        // dd($selected_tab);
         switch($selected_tab){
             case 'list_global_per_day':
                 $this->selected_tab= 'list_global_per_day';
@@ -48,8 +46,10 @@ class CovidGlobalData extends Component
                 case 'list_by_country':
                     default:
                     $this->selected_tab= 'list_by_country';
-                break;
+                    $this->page=0;
+                    break;
         }
+        // $this->hydrate();
 
     }
 
@@ -100,12 +100,18 @@ class CovidGlobalData extends Component
         $CovidDataTable = new Paginator($this->collectionCovidByCountryData,15,$this->page);
         $CovidDataData = array_slice($this->collectionCovidByCountryData,15*$this->page,15,true);
 // dd($this->collectionCovidByCountryData);
+        
+        $view_covid_table_by_country = view('livewire.parts.covid-table-by-country')->with([
+            'CovidDataTable' => $CovidDataTable,
+            'CovidDataData' => $CovidDataData,
+            'page' => $this->page
+
+        ]);
         return view('livewire.covid-global-data')->with([
             'newPerDayModel' => $newPerDayModel,
             'recoveredPerDayModel' => $recoveredPerDayModel,
             'deathsPerDayModel' => $deathsPerDayModel,
-            'CovidDataTable' => $CovidDataTable,
-            'CovidDataData' => $CovidDataData
+            'view_covid_table_by_country' => $view_covid_table_by_country,
             
         ]);
     }
